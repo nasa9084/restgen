@@ -10,6 +10,8 @@ import (
 	"golang.org/x/tools/imports"
 )
 
+// GenerateSchemaTypes generates Go's type definitions from .components.schemas.
+// The generated source is formatted by goimports.
 func GenerateSchemaTypes(spec *openapi.Document) ([]byte, error) {
 	components := spec.Components
 	if components == nil {
@@ -55,6 +57,8 @@ func generateSchemaType(name string, schema *openapi.Schema) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
+// GenerateResponseTypes generates Go's type definitions from .components.responses.
+// The generated source is formatted by goimports.
 func GenerateResponseTypes(spec *openapi.Document) ([]byte, error) {
 	components := spec.Components
 	if components == nil {
@@ -81,7 +85,11 @@ func GenerateResponseTypes(spec *openapi.Document) ([]byte, error) {
 		}
 		buf.Write(t)
 	}
-	return buf.Bytes(), nil
+	src, err := imports.Process("", buf.Bytes(), &imports.Options{Fragment: true, Comments: true})
+	if err != nil {
+		return nil, err
+	}
+	return src, nil
 }
 
 func generateResponseType(name string, response *openapi.Response) ([]byte, error) {
@@ -104,6 +112,8 @@ func generateResponseType(name string, response *openapi.Response) ([]byte, erro
 	return buf.Bytes(), nil
 }
 
+// GenerateRequestTypes generates Go's type definitions from .components.requestBodies.
+// The generated source is formatted by goimports.
 func GenerateRequestTypes(spec *openapi.Document) ([]byte, error) {
 	components := spec.Components
 	if components == nil {
@@ -129,7 +139,11 @@ func GenerateRequestTypes(spec *openapi.Document) ([]byte, error) {
 		}
 		buf.Write(t)
 	}
-	return buf.Bytes(), nil
+	src, err := imports.Process("", buf.Bytes(), &imports.Options{Fragment: true, Comments: true})
+	if err != nil {
+		return nil, err
+	}
+	return src, nil
 }
 
 func generateRequestType(name string, requestBody *openapi.RequestBody) ([]byte, error) {
