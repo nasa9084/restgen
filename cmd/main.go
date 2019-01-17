@@ -1,8 +1,8 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -61,7 +61,7 @@ func (cmd VersionCommand) Execute([]string) error {
 
 type NewCommand struct {
 	Directory string `short:"d" long:"directory" default:"." description:"target directory"`
-	Arg       struct {
+	Args      struct {
 		ApplicationName string `positional-arg-name:"APPLICATION_NAME"`
 	} `positional-args:"yes"`
 }
@@ -95,41 +95,39 @@ func (cmd NewCommand) Execute([]string) error {
 	if _, err := os.Stat(specFile); err == nil {
 		return errors.New("spec.yaml has been existing")
 	}
-	var buf bytes.Buffer
-	buf.WriteString("---")
-	buf.WriteString("\nopenapi: 3.0.2")
-	buf.WriteString("\ninfo: ")
-	fmt.Fprintf(&buf, "\n  title: %s", cmd.Arg.ApplicationName)
-	buf.WriteString("\n  version: v0.0.1")
-	buf.WriteString("\npaths:")
-	buf.WriteString("\n  /:")
-	buf.WriteString("\n    get:")
-	buf.WriteString("\n      description: health check")
-	buf.WriteString("\n      operationId: HealthCheck")
-	buf.WriteString("\n      responses:")
-	buf.WriteString("\n        '200':")
-	buf.WriteString("\n          $ref: \"#/components/responses/HealthCheckResponse\"")
-	buf.WriteString("\ncomponents:")
-	buf.WriteString("\n  responses:")
-	buf.WriteString("\n    HealthCheckResponse:")
-	buf.WriteString("\n      description: response for HealthCheck")
-	buf.WriteString("\n      content:")
-	buf.WriteString("\n        application/json:")
-	buf.WriteString("\n          schema:")
-	buf.WriteString("\n            type: object")
-	buf.WriteString("\n            properties:")
-	buf.WriteString("\n              status:")
-	buf.WriteString("\n                type: string")
+	defaultSpec, err := Assets.Open("/assets/default_spec.yaml.tmpl")
+	if err != nil {
+		return errors.Wrap(err, "opening from assets")
+	}
+	defer defaultSpec.Close()
+	b, err := ioutil.ReadAll(defaultSpec)
+	if err != nil {
+		return err
+	}
 	f, err := os.OpenFile(specFile, os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-	if _, err := f.Write(buf.Bytes()); err != nil {
+	if _, err := fmt.Fprintf(f, string(b), cmd.Args.ApplicationName); err != nil {
 		return err
 	}
 	if opts.Verbose {
-		log.Printf("generate spec.yaml\n%s", buf.String())
+		log.Printf("generated spec.yaml\n%s", string(b))
+	}
+	srvGo, err := Assets.Open("/assets/server_main.go.tmpl")
+	if err != nil {
+		return err
+	}
+	defer srvGo.Close()
+	srvGoFile := filepath.Join(cmd.Directory, "cmd", "server", "main.go")
+	f, err = os.OpenFile(srvGoFile, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	if opts.Verbose {
+		log.Printf("generated %s", srvGoFile)
 	}
 	return nil
 }

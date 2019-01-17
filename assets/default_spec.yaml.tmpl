@@ -1,0 +1,24 @@
+---
+openapi: 3.0.2
+info:
+  title: %s
+  version: v0.0.1
+paths:
+  /:
+    get:
+      description: health check
+      operationId: HealthCheck
+      responses:
+        '200':
+          $ref: '#/components/responses/HealthCheckResponse'
+components:
+  responses:
+    HealthCheckResponse:
+      description: response for HealthCheck
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
