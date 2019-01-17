@@ -61,11 +61,15 @@ func (cmd VersionCommand) Execute([]string) error {
 
 type NewCommand struct {
 	Directory string `short:"d" long:"directory" default:"." description:"target directory"`
+	Arg       struct {
+		ApplicationName string `positional-arg-name:"APPLICATION_NAME"`
+	} `positional-args:"yes"`
 }
 
 var dirs = []string{
 	"api",
 	"internal/pkg/models",
+	"cmd",
 }
 
 func (cmd NewCommand) Execute([]string) error {
@@ -93,11 +97,29 @@ func (cmd NewCommand) Execute([]string) error {
 	}
 	var buf bytes.Buffer
 	buf.WriteString("---")
-	buf.WriteString("\nopenapi: ")
+	buf.WriteString("\nopenapi: 3.0.2")
 	buf.WriteString("\ninfo: ")
-	buf.WriteString("\n\ttitle: ")
-	buf.WriteString("\n\tversion: ")
-	buf.WriteString("\npaths: ")
+	fmt.Fprintf(&buf, "\n  title: %s", cmd.Arg.ApplicationName)
+	buf.WriteString("\n  version: v0.0.1")
+	buf.WriteString("\npaths:")
+	buf.WriteString("\n  /:")
+	buf.WriteString("\n    get:")
+	buf.WriteString("\n      description: health check")
+	buf.WriteString("\n      operationId: HealthCheck")
+	buf.WriteString("\n      responses:")
+	buf.WriteString("\n        '200':")
+	buf.WriteString("\n          $ref: \"#/components/responses/HealthCheckResponse\"")
+	buf.WriteString("\ncomponents:")
+	buf.WriteString("\n  responses:")
+	buf.WriteString("\n    HealthCheckResponse:")
+	buf.WriteString("\n      description: response for HealthCheck")
+	buf.WriteString("\n      content:")
+	buf.WriteString("\n        application/json:")
+	buf.WriteString("\n          schema:")
+	buf.WriteString("\n            type: object")
+	buf.WriteString("\n            properties:")
+	buf.WriteString("\n              status:")
+	buf.WriteString("\n                type: string")
 	f, err := os.OpenFile(specFile, os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
 		return err
