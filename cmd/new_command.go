@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -20,7 +21,7 @@ type NewCommand struct {
 var dirs = []string{
 	"api",
 	"internal/pkg/models",
-	"cmd",
+	"cmd/server",
 }
 
 func (cmd NewCommand) Execute([]string) error {
@@ -93,14 +94,17 @@ func (cmd NewCommand) createServerMain() error {
 		return err
 	}
 	defer srvGo.Close()
-	srvGoFile := filepath.Join(cmd.Directory, "cmd", "server", "main.go")
-	f, err := os.OpenFile(srvGoFile, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
+	path := filepath.Join(cmd.Directory, "cmd", "server", "main.go")
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
+	if _, err := io.Copy(f, srvGo); err != nil {
+		return err
+	}
 	if opts.Verbose {
-		log.Printf("generated %s", srvGoFile)
+		log.Printf("generated %s", path)
 	}
 	return nil
 }
