@@ -28,6 +28,9 @@ func (cmd NewCommand) Execute([]string) error {
 	if err := cmd.createDirectories(); err != nil {
 		return err
 	}
+	if err := cmd.createMakefile(); err != nil {
+		return err
+	}
 	if err := cmd.createSpecFile(); err != nil {
 		return err
 	}
@@ -52,6 +55,34 @@ func (cmd NewCommand) createDirectories() error {
 		if err := os.MkdirAll(dirPath, 0755); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func (cmd NewCommand) createMakefile() error {
+	makefile, err := Assets.Open("/assets/makefile.tmpl")
+	if err != nil {
+		return err
+	}
+	defer makefile.Close()
+
+	b, err := ioutil.ReadAll(makefile)
+	if err != nil {
+		return err
+	}
+
+	path := filepath.Join(cmd.Directory, "Makefile")
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	if _, err := fmt.Fprintf(f, string(b), cmd.Args.ApplicationName); err != nil {
+		return err
+	}
+	if opts.Verbose {
+		log.Printf("generated Makefile\n%s", string(b))
 	}
 	return nil
 }
