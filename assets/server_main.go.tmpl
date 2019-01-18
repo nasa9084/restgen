@@ -35,7 +35,8 @@ func _main() error {
 	defer cancel()
 
 	srv := http.Server{
-		Addr: opts.Addr,
+		Addr:    opts.Addr,
+		Handler: NewRouter(),
 	}
 
 	sigCh := make(chan os.Signal, 1)
