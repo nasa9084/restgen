@@ -42,7 +42,9 @@ fi
 exec git diff-index --check --cached $against --
 
 make test
-if [  $? -ne 0 ]
+if [  $? -eq 0 ]
 then
+    echo "test success"
+else
     echo "test failed"
 fi
