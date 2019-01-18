@@ -74,6 +74,9 @@ func (cmd GenerateSchemaCommand) Execute([]string) error {
 	if err != nil {
 		return err
 	}
+	if len(src) == 0 {
+		return nil
+	}
 	f, err := os.OpenFile(filepath.Join(cmd.Directory, "internal", "pkg", "models", "schema_gen.go"), os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0644)
 	if err != nil {
 		return err
@@ -98,6 +101,9 @@ func (cmd GenerateRequestCommand) Execute([]string) error {
 	if err != nil {
 		return err
 	}
+	if len(src) == 0 {
+		return nil
+	}
 	f, err := os.OpenFile(filepath.Join(cmd.Directory, "internal", "pkg", "models", "request_gen.go"), os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0644)
 	if err != nil {
 		return err
@@ -121,6 +127,9 @@ func (cmd GenerateResponseCommand) Execute([]string) error {
 	src, err := generator.GenerateResponseTypes(spec)
 	if err != nil {
 		return err
+	}
+	if len(src) == 0 {
+		return nil
 	}
 	f, err := os.OpenFile(filepath.Join(cmd.Directory, "internal", "pkg", "models", "response_gen.go"), os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0644)
 	if err != nil {
