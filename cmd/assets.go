@@ -11,11 +11,11 @@ var _Assets500f7cbde70f0efeb6d3121446a2fda68852cdee = "APP_NAME = %s\nBIN_DIR = 
 var _Assetsf506750bdd1f5f056cd3153f6e7b0355f4ecdb21 = "---\nopenapi: 3.0.2\ninfo:\n  title: %s\n  version: v0.0.1\npaths:\n  /:\n    get:\n      description: health check\n      operationId: HealthCheck\n      responses:\n        '200':\n          $ref: '#/components/responses/HealthCheckResponse'\ncomponents:\n  responses:\n    HealthCheckResponse:\n      description: response for HealthCheck\n      content:\n        application/json:\n          schema:\n            type: object\n            properties:\n              status:\n                type: string\n"
 
 // Assets returns go-assets FileSystem
-var Assets = assets.NewFileSystem(map[string][]string{"/assets": []string{"server_main.go.tmpl", "makefile.tmpl", "default_spec.yaml.tmpl"}, "/": []string{"assets"}}, map[string]*assets.File{
+var Assets = assets.NewFileSystem(map[string][]string{"/": []string{"assets"}, "/assets": []string{"server_main.go.tmpl", "makefile.tmpl", "default_spec.yaml.tmpl"}}, map[string]*assets.File{
 	"/": &assets.File{
 		Path:     "/",
 		FileMode: 0x800001ed,
-		Mtime:    time.Unix(1547797826, 1547797826125483997),
+		Mtime:    time.Unix(1547797925, 1547797925570480387),
 		Data:     nil,
 	}, "/assets": &assets.File{
 		Path:     "/assets",
