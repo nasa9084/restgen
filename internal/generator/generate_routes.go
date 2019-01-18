@@ -75,7 +75,7 @@ func GenerateHandlers(spec *openapi.Document) ([]byte, error) {
 			buf.WriteString("\n}")
 			buf.WriteString("\nbuf := getBuffer()")
 			buf.WriteString("\ndefer releaseBuffer(buf)")
-			buf.WriteString("\nif err := json.NewDecoder(&buf).Decode(res); err != nil {")
+			buf.WriteString("\nif err := json.NewEncoder(&buf).Decode(res); err != nil {")
 			buf.WriteString("\nw.WriteHeader(http.StatusInternalServerError)")
 			buf.WriteString("\nreturn")
 			buf.WriteString("\n}")
