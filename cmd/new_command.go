@@ -21,6 +21,7 @@ type NewCommand struct {
 var dirs = []string{
 	"api",
 	"internal/pkg/models",
+	"internal/pkg/httperr",
 	"cmd/server",
 }
 
@@ -35,6 +36,9 @@ func (cmd NewCommand) Execute([]string) error {
 		return err
 	}
 	if err := cmd.createServerMain(); err != nil {
+		return err
+	}
+	if err := cmd.createHTTPErr(); err != nil {
 		return err
 	}
 	return nil
@@ -93,7 +97,8 @@ func (cmd NewCommand) createSpecFile() error {
 		log.Printf("create OpenAPI Spec file: %s\n", specFile)
 	}
 	if _, err := os.Stat(specFile); err == nil {
-		return errors.New("spec.yaml has been existing")
+		log.Print("spec.yaml has been existing")
+		return nil
 	}
 	defaultSpec, err := Assets.Open("/assets/default_spec.yaml.tmpl")
 	if err != nil {
@@ -132,6 +137,27 @@ func (cmd NewCommand) createServerMain() error {
 	}
 	defer f.Close()
 	if _, err := io.Copy(f, srvGo); err != nil {
+		return err
+	}
+	if opts.Verbose {
+		log.Printf("generated %s", path)
+	}
+	return nil
+}
+
+func (cmd NewCommand) createHTTPErr() error {
+	httpErr, err := Assets.Open("/assets/httperr_httperr.go.tmpl")
+	if err != nil {
+		return err
+	}
+	defer httpErr.Close()
+	path := filepath.Join(cmd.Directory, "internal", "pkg", "httperr", "httperr_gen.go")
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	if _, err := io.Copy(f, httpErr); err != nil {
 		return err
 	}
 	if opts.Verbose {
