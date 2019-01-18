@@ -11,18 +11,18 @@ import (
 type GenerateCommand struct {
 	Directory string `short:"d" long:"directory" default:"." description:"target directory"`
 
-	Route    GenerateRouteCommand    `command:"route"`
+	Handler  GenerateHandlerCommand  `command:"handler"`
 	Schema   GenerateSchemaCommand   `command:"schema"`
 	Request  GenerateRequestCommand  `command:"request"`
 	Response GenerateResponseCommand `command:"response"`
 }
 
 func (cmd GenerateCommand) Execute(args []string) error {
-	cmd.Route.Directory = cmd.Directory
+	cmd.Handler.Directory = cmd.Directory
 	cmd.Schema.Directory = cmd.Directory
 	cmd.Request.Directory = cmd.Directory
 	cmd.Response.Directory = cmd.Directory
-	if err := cmd.Route.Execute(args); err != nil {
+	if err := cmd.Handler.Execute(args); err != nil {
 		return err
 	}
 	if err := cmd.Schema.Execute(args); err != nil {
@@ -37,16 +37,16 @@ func (cmd GenerateCommand) Execute(args []string) error {
 	return nil
 }
 
-type GenerateRouteCommand struct {
+type GenerateHandlerCommand struct {
 	Directory string `short:"d" long:"directory" default:"." description:"target directory"`
 }
 
-func (cmd GenerateRouteCommand) Execute([]string) error {
+func (cmd GenerateHandlerCommand) Execute([]string) error {
 	spec, err := openapi.LoadFile(filepath.Join(cmd.Directory, "api", "spec.yaml"))
 	if err != nil {
 		return err
 	}
-	src, err := generator.GenerateRoutes(spec)
+	src, err := generator.GenerateHandlers(spec)
 	if err != nil {
 		return err
 	}

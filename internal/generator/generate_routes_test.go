@@ -7,7 +7,7 @@ import (
 	"github.com/nasa9084/restgen/internal/generator"
 )
 
-func TestGenerateRoutes(t *testing.T) {
+func TestGenerateHandlers(t *testing.T) {
 	spec := `---
 paths:
   /:
@@ -22,7 +22,7 @@ paths:
 	if err != nil {
 		t.Fatal(err)
 	}
-	src, err := generator.GenerateRoutes(doc)
+	src, err := generator.GenerateHandlers(doc)
 	if err != nil {
 		t.Error(err)
 		return
@@ -41,6 +41,26 @@ func NewRouter() http.Handler {
 	r := mux.NewRouter()
 	r.HandleFunc("/", FooHandler).Methods("GET")
 	return r
+}
+
+func FooHandler(w http.ResponseWriter, r *http.Request) {
+	st, hdr, res, err := Foo(r)
+	if err != nil {
+		return
+	}
+	var buf bytes.Buffer
+	if err := json.NewDecoder(&buf).Decode(res); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if _, err := buf.WriteTo(w); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	for k, v := range hdr {
+		w.Header().Add(k, v)
+	}
+	w.WriteHeader(st)
 }
 `
 	if string(src) != expected {
