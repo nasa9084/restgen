@@ -1,17 +1,36 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
 	flags "github.com/jessevdk/go-flags"
 	"github.com/pkg/errors"
 )
+
+var bufferPool = sync.Pool{
+	New: allocateBuffer,
+}
+
+func allocateBuffer() interface{} {
+	return &bytes.Buffer{}
+}
+
+func getBuffer() *bytes.Buffer {
+	return bufferPool.Get().(*bytes.Buffer)
+}
+
+func releaseBuffer(buf *bytes.Buffer) {
+	buf.Reset()
+	bufferPool.Put(buf)
+}
 
 type options struct {
 	Addr string `short:"a" long:"address" default:":8080" description:"address to listen to"`
