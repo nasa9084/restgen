@@ -1,0 +1,14 @@
+package httperr
+
+import "net/http"
+
+func Status(err error) int {
+	if he, ok := err.(HTTPError); ok {
+		return he.Status()
+	}
+	return http.StatusInternalServerError
+}
+
+type HTTPError interface {
+	Status() int
+}
