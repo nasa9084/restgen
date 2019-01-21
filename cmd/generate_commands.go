@@ -1,6 +1,8 @@
 package main
 
 import (
+	"io"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -18,6 +20,12 @@ type GenerateCommand struct {
 }
 
 func (cmd GenerateCommand) Execute(args []string) error {
+	if err := cmd.createServerMain(); err != nil {
+		return err
+	}
+	if err := cmd.createHTTPErr(); err != nil {
+		return err
+	}
 	cmd.Handler.Directory = cmd.Directory
 	cmd.Schema.Directory = cmd.Directory
 	cmd.Request.Directory = cmd.Directory
@@ -33,6 +41,48 @@ func (cmd GenerateCommand) Execute(args []string) error {
 	}
 	if err := cmd.Response.Execute(args); err != nil {
 		return err
+	}
+	return nil
+}
+
+func (cmd GenerateCommand) createServerMain() error {
+	srvGo, err := Assets.Open("/assets/server_main.go.tmpl")
+	if err != nil {
+		return err
+	}
+	defer srvGo.Close()
+	path := filepath.Join(cmd.Directory, "cmd", "server", "main.go")
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	if _, err := io.Copy(f, srvGo); err != nil {
+		return err
+	}
+	if opts.Verbose {
+		log.Printf("generated %s", path)
+	}
+	return nil
+}
+
+func (cmd GenerateCommand) createHTTPErr() error {
+	httpErr, err := Assets.Open("/assets/httperr_httperr.go.tmpl")
+	if err != nil {
+		return err
+	}
+	defer httpErr.Close()
+	path := filepath.Join(cmd.Directory, "internal", "pkg", "httperr", "httperr_gen.go")
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	if _, err := io.Copy(f, httpErr); err != nil {
+		return err
+	}
+	if opts.Verbose {
+		log.Printf("generated %s", path)
 	}
 	return nil
 }

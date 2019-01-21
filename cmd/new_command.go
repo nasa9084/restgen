@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -33,12 +32,6 @@ func (cmd NewCommand) Execute([]string) error {
 		return err
 	}
 	if err := cmd.createSpecFile(); err != nil {
-		return err
-	}
-	if err := cmd.createServerMain(); err != nil {
-		return err
-	}
-	if err := cmd.createHTTPErr(); err != nil {
 		return err
 	}
 	return nil
@@ -120,48 +113,6 @@ func (cmd NewCommand) createSpecFile() error {
 	}
 	if opts.Verbose {
 		log.Printf("generated spec.yaml\n%s", string(b))
-	}
-	return nil
-}
-
-func (cmd NewCommand) createServerMain() error {
-	srvGo, err := Assets.Open("/assets/server_main.go.tmpl")
-	if err != nil {
-		return err
-	}
-	defer srvGo.Close()
-	path := filepath.Join(cmd.Directory, "cmd", "server", "main.go")
-	f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	if _, err := io.Copy(f, srvGo); err != nil {
-		return err
-	}
-	if opts.Verbose {
-		log.Printf("generated %s", path)
-	}
-	return nil
-}
-
-func (cmd NewCommand) createHTTPErr() error {
-	httpErr, err := Assets.Open("/assets/httperr_httperr.go.tmpl")
-	if err != nil {
-		return err
-	}
-	defer httpErr.Close()
-	path := filepath.Join(cmd.Directory, "internal", "pkg", "httperr", "httperr_gen.go")
-	f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	if _, err := io.Copy(f, httpErr); err != nil {
-		return err
-	}
-	if opts.Verbose {
-		log.Printf("generated %s", path)
 	}
 	return nil
 }
