@@ -1,14 +1,11 @@
 package main
 
 import (
-	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 
-	"github.com/nasa9084/restgen/internal/pkg/assets"
-	"github.com/pkg/errors"
+	"github.com/nasa9084/restgen/internal/pkg/generator"
 )
 
 type NewCommand struct {
@@ -58,62 +55,34 @@ func (cmd NewCommand) createDirectories() error {
 }
 
 func (cmd NewCommand) createMakefile() error {
-	makefile, err := assets.Assets.Open("/assets/makefile.tmpl")
+	makefile := filepath.Join(cmd.Directory, "Makefile")
+	if _, err := os.Stat(makefile); err == nil {
+		log.Print("Makefile has been existing")
+		return nil
+	}
+	out, err := generator.Template("/makefile.tmpl", makefile, cmd.Args.ApplicationName)
 	if err != nil {
 		return err
 	}
-	defer makefile.Close()
 
-	b, err := ioutil.ReadAll(makefile)
-	if err != nil {
-		return err
-	}
-
-	path := filepath.Join(cmd.Directory, "Makefile")
-	f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	if _, err := fmt.Fprintf(f, string(b), cmd.Args.ApplicationName); err != nil {
-		return err
-	}
 	if opts.Verbose {
-		log.Printf("generated Makefile\n%s", string(b))
+		log.Printf("generated Makefile\n%s", out)
 	}
 	return nil
 }
 
 func (cmd NewCommand) createSpecFile() error {
 	specFile := filepath.Join(cmd.Directory, "api", "spec.yaml")
-	if opts.Verbose {
-		log.Printf("create OpenAPI Spec file: %s\n", specFile)
-	}
 	if _, err := os.Stat(specFile); err == nil {
 		log.Print("spec.yaml has been existing")
 		return nil
 	}
-	defaultSpec, err := assets.Assets.Open("/assets/default_spec.yaml.tmpl")
+	out, err := generator.Template("/default_spec.yaml.tmpl", specFile, cmd.Args.ApplicationName)
 	if err != nil {
-		return errors.Wrap(err, "opening from assets")
-	}
-	defer defaultSpec.Close()
-
-	b, err := ioutil.ReadAll(defaultSpec)
-	if err != nil {
-		return err
-	}
-	f, err := os.OpenFile(specFile, os.O_CREATE|os.O_RDWR, 0644)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	if _, err := fmt.Fprintf(f, string(b), cmd.Args.ApplicationName); err != nil {
 		return err
 	}
 	if opts.Verbose {
-		log.Printf("generated spec.yaml\n%s", string(b))
+		log.Printf("generated spec.yaml\n%s", out)
 	}
 	return nil
 }

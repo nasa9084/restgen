@@ -1,13 +1,11 @@
 package main
 
 import (
-	"io"
 	"log"
 	"os"
 	"path/filepath"
 
 	openapi "github.com/nasa9084/go-openapi"
-	"github.com/nasa9084/restgen/internal/pkg/assets"
 	"github.com/nasa9084/restgen/internal/pkg/generator"
 )
 
@@ -47,18 +45,8 @@ func (cmd GenerateCommand) Execute(args []string) error {
 }
 
 func (cmd GenerateCommand) createServerMain() error {
-	srvGo, err := assets.Assets.Open("/assets/server_main.go.tmpl")
-	if err != nil {
-		return err
-	}
-	defer srvGo.Close()
 	path := filepath.Join(cmd.Directory, "cmd", "server", "main.go")
-	f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	if _, err := io.Copy(f, srvGo); err != nil {
+	if _, err := generator.Template("server_main.go.tmpl", path); err != nil {
 		return err
 	}
 	if opts.Verbose {
@@ -68,18 +56,8 @@ func (cmd GenerateCommand) createServerMain() error {
 }
 
 func (cmd GenerateCommand) createHTTPErr() error {
-	httpErr, err := assets.Assets.Open("/assets/httperr_httperr.go.tmpl")
-	if err != nil {
-		return err
-	}
-	defer httpErr.Close()
 	path := filepath.Join(cmd.Directory, "internal", "pkg", "httperr", "httperr_gen.go")
-	f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	if _, err := io.Copy(f, httpErr); err != nil {
+	if _, err := generator.Template("/httperr_httperr.go.tmpl", path); err != nil {
 		return err
 	}
 	if opts.Verbose {
