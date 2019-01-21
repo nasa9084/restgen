@@ -30,6 +30,7 @@ paths:
 	expected := `package main
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -43,13 +44,19 @@ func NewRouter() http.Handler {
 	return r
 }
 
+func errorStatus(err error) int {
+	return http.StatusInternalServerError
+}
+
 func FooHandler(w http.ResponseWriter, r *http.Request) {
-	st, hdr, res, err := Foo(r)
+	hdr, res, err := Foo(r)
 	if err != nil {
+		w.WriteHeader(errorStatus(err))
 		return
 	}
-	var buf bytes.Buffer
-	if err := json.NewDecoder(&buf).Decode(res); err != nil {
+	buf := getBuffer()
+	defer releaseBuffer(buf)
+	if err := json.NewEncoder(buf).Encode(res); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -60,7 +67,7 @@ func FooHandler(w http.ResponseWriter, r *http.Request) {
 	for k, v := range hdr {
 		w.Header().Add(k, v)
 	}
-	w.WriteHeader(st)
+	w.WriteHeader(200)
 }
 `
 	if string(src) != expected {
