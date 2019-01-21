@@ -53,7 +53,7 @@ func generateSchemaType(name string, schema *openapi.Schema) ([]byte, error) {
 			fmt.Fprintf(&buf, "\n// %s", line)
 		}
 	}
-	fmt.Fprintf(&buf, "\ntype %s %s", name, schema.GoType())
+	fmt.Fprintf(&buf, "\ntype %s %s", name, GoType(schema))
 	return buf.Bytes(), nil
 }
 
@@ -108,7 +108,7 @@ func generateResponseType(name string, response *openapi.Response) ([]byte, erro
 		return nil, fmt.Errorf(".components.responses[%s].content[application/json] is nil", name)
 	}
 	buf.WriteString(" ")
-	buf.WriteString(mediaType.Schema.GoType())
+	buf.WriteString(GoType(mediaType.Schema))
 	return buf.Bytes(), nil
 }
 
@@ -159,6 +159,6 @@ func generateRequestType(name string, requestBody *openapi.RequestBody) ([]byte,
 		return nil, fmt.Errorf(".components.requestBodies[%s].content[application/json] is nil", name)
 	}
 	buf.WriteString(" ")
-	buf.WriteString(mediaType.Schema.GoType())
+	buf.WriteString(GoType(mediaType.Schema))
 	return buf.Bytes(), nil
 }
