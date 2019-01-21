@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/nasa9084/restgen/internal/pkg/assets"
 	"github.com/pkg/errors"
 )
 
@@ -57,7 +58,7 @@ func (cmd NewCommand) createDirectories() error {
 }
 
 func (cmd NewCommand) createMakefile() error {
-	makefile, err := Assets.Open("/assets/makefile.tmpl")
+	makefile, err := assets.Assets.Open("/assets/makefile.tmpl")
 	if err != nil {
 		return err
 	}
@@ -93,7 +94,7 @@ func (cmd NewCommand) createSpecFile() error {
 		log.Print("spec.yaml has been existing")
 		return nil
 	}
-	defaultSpec, err := Assets.Open("/assets/default_spec.yaml.tmpl")
+	defaultSpec, err := assets.Assets.Open("/assets/default_spec.yaml.tmpl")
 	if err != nil {
 		return errors.Wrap(err, "opening from assets")
 	}

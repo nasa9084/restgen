@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	openapi "github.com/nasa9084/go-openapi"
-	"github.com/nasa9084/restgen/internal/generator"
+	"github.com/nasa9084/restgen/internal/pkg/generator"
 )
 
 func TestGenerateHandlers(t *testing.T) {

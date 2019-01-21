@@ -7,7 +7,8 @@ import (
 	"path/filepath"
 
 	openapi "github.com/nasa9084/go-openapi"
-	"github.com/nasa9084/restgen/internal/generator"
+	"github.com/nasa9084/restgen/internal/pkg/assets"
+	"github.com/nasa9084/restgen/internal/pkg/generator"
 )
 
 type GenerateCommand struct {
@@ -46,7 +47,7 @@ func (cmd GenerateCommand) Execute(args []string) error {
 }
 
 func (cmd GenerateCommand) createServerMain() error {
-	srvGo, err := Assets.Open("/assets/server_main.go.tmpl")
+	srvGo, err := assets.Assets.Open("/assets/server_main.go.tmpl")
 	if err != nil {
 		return err
 	}
@@ -67,7 +68,7 @@ func (cmd GenerateCommand) createServerMain() error {
 }
 
 func (cmd GenerateCommand) createHTTPErr() error {
-	httpErr, err := Assets.Open("/assets/httperr_httperr.go.tmpl")
+	httpErr, err := assets.Assets.Open("/assets/httperr_httperr.go.tmpl")
 	if err != nil {
 		return err
 	}

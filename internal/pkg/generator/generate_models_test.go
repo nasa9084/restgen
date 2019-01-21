@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	openapi "github.com/nasa9084/go-openapi"
-	"github.com/nasa9084/restgen/internal/generator"
+	"github.com/nasa9084/restgen/internal/pkg/generator"
 )
 
 func TestGenerateSchemaTypes(t *testing.T) {
