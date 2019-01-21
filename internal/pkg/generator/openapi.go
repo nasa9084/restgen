@@ -61,10 +61,9 @@ func init() {
 	RegisterType("string", "password", "string")
 }
 
-// GoType returns go-type representation of given schema.
-// If you need to use custom type and format, you can register using RegisterType function.
-// (array and object cannot be overrided)
-func GoType(schema *openapi.Schema) string {
+type OpenAPISchema openapi.Schema
+
+func (schema OpenAPISchema) GoType() string {
 	if schema.Ref != "" {
 		ref := strings.Split(schema.Ref, "/")
 		return ref[len(ref)-1]
