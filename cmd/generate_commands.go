@@ -7,6 +7,7 @@ import (
 
 	openapi "github.com/nasa9084/go-openapi"
 	"github.com/nasa9084/restgen/internal/pkg/generator"
+	"github.com/pkg/errors"
 )
 
 type GenerateCommand struct {
@@ -46,8 +47,8 @@ func (cmd GenerateCommand) Execute(args []string) error {
 
 func (cmd GenerateCommand) createServerMain() error {
 	path := filepath.Join(cmd.Directory, "cmd", "server", "main.go")
-	if _, err := generator.Template("server_main.go.tmpl", path); err != nil {
-		return err
+	if _, err := generator.Template("/server_main.go.tmpl", path); err != nil {
+		return errors.Wrap(err, path)
 	}
 	if opts.Verbose {
 		log.Printf("generated %s", path)
@@ -58,7 +59,7 @@ func (cmd GenerateCommand) createServerMain() error {
 func (cmd GenerateCommand) createHTTPErr() error {
 	path := filepath.Join(cmd.Directory, "internal", "pkg", "httperr", "httperr_gen.go")
 	if _, err := generator.Template("/httperr_httperr.go.tmpl", path); err != nil {
-		return err
+		return errors.Wrap(err, path)
 	}
 	if opts.Verbose {
 		log.Printf("generated %s", path)
@@ -71,17 +72,22 @@ type GenerateHandlerCommand struct {
 }
 
 func (cmd GenerateHandlerCommand) Execute([]string) error {
-	spec, err := openapi.LoadFile(filepath.Join(cmd.Directory, "api", "spec.yaml"))
+	specPath := filepath.Join(cmd.Directory, "api", "spec.yaml")
+	spec, err := openapi.LoadFile(specPath)
 	if err != nil {
+		return errors.Wrap(err, specPath)
+	}
+	if err := spec.Validate(); err != nil {
 		return err
 	}
 	src, err := generator.GenerateHandlers(spec)
 	if err != nil {
 		return err
 	}
-	f, err := os.OpenFile(filepath.Join(cmd.Directory, "cmd", "server", "route_gen.go"), os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0644)
+	path := filepath.Join(cmd.Directory, "cmd", "server", "route_gen.go")
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0644)
 	if err != nil {
-		return err
+		return errors.Wrap(err, path)
 	}
 	defer f.Close()
 	if _, err := f.Write(src); err != nil {
@@ -97,6 +103,9 @@ type GenerateSchemaCommand struct {
 func (cmd GenerateSchemaCommand) Execute([]string) error {
 	spec, err := openapi.LoadFile(filepath.Join(cmd.Directory, "api", "spec.yaml"))
 	if err != nil {
+		return err
+	}
+	if err := spec.Validate(); err != nil {
 		return err
 	}
 	src, err := generator.GenerateSchemaTypes(spec)
@@ -126,6 +135,19 @@ func (cmd GenerateRequestCommand) Execute([]string) error {
 	if err != nil {
 		return err
 	}
+	if err := spec.Validate(); err != nil {
+		return err
+	}
+	if err := cmd.generateRequests(spec); err != nil {
+		return err
+	}
+	if err := cmd.generateRequestBodies(spec); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (cmd GenerateRequestCommand) generateRequests(spec *openapi.Document) error {
 	src, err := generator.GenerateRequestTypes(spec)
 	if err != nil {
 		return err
@@ -134,6 +156,25 @@ func (cmd GenerateRequestCommand) Execute([]string) error {
 		return nil
 	}
 	f, err := os.OpenFile(filepath.Join(cmd.Directory, "internal", "pkg", "models", "request_gen.go"), os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0644)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	if _, err := f.Write(src); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (cmd GenerateRequestCommand) generateRequestBodies(spec *openapi.Document) error {
+	src, err := generator.GenerateRequestBodyTypes(spec)
+	if err != nil {
+		return err
+	}
+	if len(src) == 0 {
+		return nil
+	}
+	f, err := os.OpenFile(filepath.Join(cmd.Directory, "internal", "pkg", "models", "request_body_gen.go"), os.O_CREATE|os.O_TRUNC|os.O_RDWR, 0644)
 	if err != nil {
 		return err
 	}
