@@ -110,7 +110,7 @@ func GenerateHandlers(spec *openapi.Document) ([]byte, error) {
 			buf.WriteString("\nfor k, vs := range hdr {")
 			buf.WriteString("\nfor _, v := range vs {")
 			buf.WriteString("\nw.Header().Add(k, v)")
-			buf.WriteString("\n")
+			buf.WriteString("\n}")
 			buf.WriteString("\n}")
 			buf.WriteString("\nw.WriteHeader(")
 			buf.WriteString(strconv.Itoa(st))
