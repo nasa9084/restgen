@@ -62,8 +62,10 @@ func FooHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	for k, v := range hdr {
-		w.Header().Add(k, v)
+	for k, vs := range hdr {
+		for _, v := range vs {
+			w.Header().Add(k, v)
+		}
 	}
 	w.WriteHeader(200)
 }
