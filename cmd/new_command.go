@@ -12,7 +12,7 @@ type NewCommand struct {
 	Directory string `short:"d" long:"directory" default:"." description:"target directory"`
 	Args      struct {
 		ApplicationName string `positional-arg-name:"APPLICATION_NAME"`
-	} `positional-args:"yes"`
+	} `positional-args:"yes" required:"yes"`
 }
 
 var dirs = []string{
