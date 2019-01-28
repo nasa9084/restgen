@@ -10,4 +10,4 @@ test:
 	@go test -v ./...
 
 build: $(BIN_DIR) test
-	@go build -v cmd/* -o $(BIN_DIR)/$(APP_NAME)
+	@go build -v -o $(BIN_DIR)/$(APP_NAME) cmd/server/*

@@ -10,3 +10,6 @@ build:
 
 test:
 	@go test -v ./...
+
+install: build
+	@cp bin/restgen $(GOPATH)/bin/restgen
