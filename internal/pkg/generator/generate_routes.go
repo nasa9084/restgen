@@ -103,10 +103,6 @@ func GenerateHandlers(spec *openapi.Document) ([]byte, error) {
 			buf.WriteString("\nw.WriteHeader(http.StatusInternalServerError)")
 			buf.WriteString("\nreturn")
 			buf.WriteString("\n}")
-			buf.WriteString("\nif _, err := buf.WriteTo(w); err != nil {")
-			buf.WriteString("\nw.WriteHeader(http.StatusInternalServerError)")
-			buf.WriteString("\nreturn")
-			buf.WriteString("\n}")
 			buf.WriteString("\nfor k, vs := range hdr {")
 			buf.WriteString("\nfor _, v := range vs {")
 			buf.WriteString("\nw.Header().Add(k, v)")
@@ -115,6 +111,7 @@ func GenerateHandlers(spec *openapi.Document) ([]byte, error) {
 			buf.WriteString("\nw.WriteHeader(")
 			buf.WriteString(strconv.Itoa(st))
 			buf.WriteString(")")
+			buf.WriteString("\nbuf.WriteTo(w)")
 			buf.WriteString("\n}")
 		}
 	}
