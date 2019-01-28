@@ -83,7 +83,7 @@ func (schema OpenAPISchema) GoType() string {
 			prop := schema.Properties[name]
 			// call 4 times WriteString is faster than fmt.Fprintf
 			buf.WriteString("\n")
-			buf.WriteString(name)
+			buf.WriteString(strings.Title(name))
 			buf.WriteString(" ")
 			buf.WriteString(prop.GoType())
 		}
