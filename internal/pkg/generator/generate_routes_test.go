@@ -58,16 +58,13 @@ func FooHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	if _, err := buf.WriteTo(w); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
 	for k, vs := range hdr {
 		for _, v := range vs {
 			w.Header().Add(k, v)
 		}
 	}
 	w.WriteHeader(200)
+	buf.WriteTo(w)
 }
 `
 	if string(src) != expected {
