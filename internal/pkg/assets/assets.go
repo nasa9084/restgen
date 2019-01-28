@@ -13,17 +13,7 @@ var _Assetsf506750bdd1f5f056cd3153f6e7b0355f4ecdb21 = "---\nopenapi: 3.0.2\ninfo
 
 // Assets returns go-assets FileSystem
 var Assets = assets.NewFileSystem(map[string][]string{"/": []string{"httperr_httperr.go.tmpl", "server_main.go.tmpl", "makefile.tmpl", "default_spec.yaml.tmpl"}}, map[string]*assets.File{
-	"/": &assets.File{
-		Path:     "/",
-		FileMode: 0x800001ed,
-		Mtime:    time.Unix(1547802237, 1547802237874376106),
-		Data:     nil,
-	}, "/httperr_httperr.go.tmpl": &assets.File{
-		Path:     "/httperr_httperr.go.tmpl",
-		FileMode: 0x1a4,
-		Mtime:    time.Unix(1547802649, 1547802649207046066),
-		Data:     []byte(_Assets716ac1c24cf0f03e2829e302a72890445c2f6a4a),
-	}, "/server_main.go.tmpl": &assets.File{
+	"/server_main.go.tmpl": &assets.File{
 		Path:     "/server_main.go.tmpl",
 		FileMode: 0x1a4,
 		Mtime:    time.Unix(1547800290, 1547800290011082986),
@@ -38,4 +28,14 @@ var Assets = assets.NewFileSystem(map[string][]string{"/": []string{"httperr_htt
 		FileMode: 0x1a4,
 		Mtime:    time.Unix(1547704898, 1547704898394350439),
 		Data:     []byte(_Assetsf506750bdd1f5f056cd3153f6e7b0355f4ecdb21),
+	}, "/": &assets.File{
+		Path:     "/",
+		FileMode: 0x800001ed,
+		Mtime:    time.Unix(1547802237, 1547802237874376106),
+		Data:     nil,
+	}, "/httperr_httperr.go.tmpl": &assets.File{
+		Path:     "/httperr_httperr.go.tmpl",
+		FileMode: 0x1a4,
+		Mtime:    time.Unix(1547802649, 1547802649207046066),
+		Data:     []byte(_Assets716ac1c24cf0f03e2829e302a72890445c2f6a4a),
 	}}, "")
