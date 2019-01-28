@@ -47,7 +47,7 @@ func (cmd GenerateCommand) Execute(args []string) error {
 
 func (cmd GenerateCommand) createServerMain() error {
 	path := filepath.Join(cmd.Directory, "cmd", "server", "main.go")
-	if _, err := generator.Template("/server_main.go.tmpl", path); err != nil {
+	if _, err := generator.Template("/server_main.go.tmpl", path, "%s"); err != nil {
 		return errors.Wrap(err, path)
 	}
 	if opts.Verbose {
