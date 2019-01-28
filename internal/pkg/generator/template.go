@@ -20,7 +20,7 @@ func Template(src, dest string, values ...interface{}) (string, error) {
 		return "", err
 	}
 
-	destFile, err := os.OpenFile(dest, os.O_CREATE|os.O_RDWR, 0644)
+	destFile, err := os.OpenFile(dest, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
 	if err != nil {
 		return "", err
 	}
